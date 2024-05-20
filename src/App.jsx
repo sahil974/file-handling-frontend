@@ -1,12 +1,17 @@
 import axios from "axios"
-import { useState } from "react"
+import { useContext, useState } from "react"
+import { useNavigate } from "react-router-dom";
+import UserContext from "./Context/UserContext";
 
 function App() {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [avatar, setAvatar] = useState(null)
-  const [user, setUser] = useState(null)
+
+  const { addUser } = useContext(UserContext)
+
+  const navigate = useNavigate()
 
   const handleSubmit = async () => {
     try {
@@ -24,10 +29,12 @@ function App() {
         email: response.data.data.email,
         avatar: response.data.data.avatar
       }
-      setUser(tempUser)
-      console.log(response);
-      console.log(tempUser);
 
+      addUser(tempUser)
+      console.log(response);
+      localStorage.setItem("token", response.data.token)
+
+      navigate('/dashboard')
     } catch (error) {
       console.log("Error while post request");
     }
@@ -68,12 +75,7 @@ function App() {
       </div>
       <button onClick={handleSubmit}>Submit</button>
 
-      {user && (<div>
-        <p>Name: {user.name}</p>
-        <p>Email: {user.email}</p>
-        <img src={user.avatar} alt="avatar" width={400} />
-      </div>)
-      }
+
     </div>
   )
 }
